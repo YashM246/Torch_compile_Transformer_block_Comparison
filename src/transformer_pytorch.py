@@ -44,7 +44,16 @@ class Transformer_Block(nn.Module):
 
         # Calculate Attention
 
-        atten = torch.softmax((Q @ K.T)/torch.sqrt(torch.tensor(self.D_MODEL, dtype=torch.float32)), dim=-1) @ V
+        # atten = torch.softmax((Q @ K.T)/torch.sqrt(torch.tensor(self.D_MODEL, dtype=torch.float32)), dim=-1) @ V
+        # This will only handle (seq_len, d_model) sized 2D inputs
+        # In case of batching the shape will be (batch_size, seq_len, d_model)
+        # Therefore .T will not work
+        # Using .T will create a shape of (d_model, seq_len, batch_size)
+
+        atten = torch.softmax((Q @ torch.transpose(K, -1, -2))/torch.sqrt(torch.tensor(self.D_MODEL, dtype=torch.float32)), dim=-1) @ V
+
+        # Now the transpose will create a shape of (batch_size, d_model, seq_len)
+        # This will work for 2D as well as 3D inputs
 
         if verbose:
             print(f"\nShape of Initial Attention Matrix = {atten.shape}")

@@ -62,7 +62,15 @@ class Transformer_Block:
         V = x @ self.W_v
 
         # Calculate Attention
-        atten = self.softmax((Q @ K.T)/np.sqrt(self.D_MODEL)) @ V
+        
+        # atten = self.softmax((Q @ K.T)/np.sqrt(self.D_MODEL)) @ V
+        # This will only work for inputs with 2D shape i.e. (seq_len, d_model)
+        # If we want to consider batches, the shape would be (batch_size, seq_len, d_model)
+        # A simple .T transpose will cause the shape to be (d_model, seq_len, batch_size)
+
+        atten = self.softmax((Q @ np.swapaxes(K, -1, -2))/np.sqrt(self.D_MODEL)) @ V
+        # Now the shape for K will be (batch_size, d_model, seq_len)
+        # Now this will work for both 2D and 3D inputs
 
         if verbose:
             print(f"\nShape of Initial Attention Matrix = {atten.shape}")
