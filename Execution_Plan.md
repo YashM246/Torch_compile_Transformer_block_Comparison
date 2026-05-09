@@ -193,7 +193,7 @@ This reflection is not busywork. At your internship, you will be explaining thes
 
 ## Constraints and Scope Guards
 
-- Single Transformer block only. Not a full model.
+- Single Transformer block only. Not a full model. Specifically, one Encoder block (self-attention + residual + LayerNorm + FFN + residual + LayerNorm) — the repeating unit inside a Transformer Encoder. No Decoder, no cross-attention, no embedding layers.
 - Single-head attention only. Multi-head adds complexity without adding learning value here.
 - No training loop. Forward pass only.
 - No GPU required. CPU is fine for this scale. If you have a GPU, run both and note the difference.
